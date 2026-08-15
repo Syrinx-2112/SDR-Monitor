@@ -1,0 +1,11 @@
+# Exemple crontab : lance un passage complet (toutes les bandes de config.yaml)
+# toutes les 15 minutes, puis ré-ingère + met à jour un waterfall.
+#
+# Installation : crontab -e   (puis coller les lignes ci-dessous en adaptant les chemins)
+
+# Scan toutes les 15 min
+*/15 * * * * cd /home/pi/rtlsdr_monitor && /usr/bin/python3 -m rtlsdr_monitor.cli --config config.yaml scan --once >> logs/scan.log 2>&1
+
+# Ingestion + génération d'un waterfall + détection, toutes les heures
+5 * * * * cd /home/pi/rtlsdr_monitor && /usr/bin/python3 -m rtlsdr_monitor.cli --config config.yaml ingest >> logs/ingest.log 2>&1
+7 * * * * cd /home/pi/rtlsdr_monitor && /usr/bin/python3 -m rtlsdr_monitor.cli --config config.yaml detect --last 48h --plot >> logs/detect.log 2>&1

@@ -1,0 +1,22 @@
+[Unit]
+Description=rtlsdr_monitor - scan RF planifie (mode boucle interne)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/rtlsdr_monitor
+ExecStart=/usr/bin/python3 -m rtlsdr_monitor.cli --config config.yaml scan --loop
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+
+# Installation :
+#   sudo cp rtlsdr-monitor.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now rtlsdr-monitor
+#
+# Pour l'ingestion+detection en continu, dupliquer ce fichier en
+# rtlsdr-monitor-watch.service avec :
+#   ExecStart=/usr/bin/python3 -m rtlsdr_monitor.cli --config config.yaml watch --last 48h

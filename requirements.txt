@@ -1,0 +1,10 @@
+pandas>=1.5
+numpy>=1.23
+matplotlib>=3.6
+PyYAML>=6.0
+
+# Optionnel mais recommandé : stockage Parquet (bien plus rapide/compact que CSV.gz)
+pyarrow>=12.0
+
+# Optionnel : waterfalls interactifs (zoom/hover) si viz.interactive_html: true
+# plotly>=5.15

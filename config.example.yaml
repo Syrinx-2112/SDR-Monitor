@@ -1,0 +1,75 @@
+# Exemple de configuration rtlsdr_monitor.
+# Copie ce fichier en config.yaml et adapte-le : toutes les clés sont
+# optionnelles (les valeurs par défaut de config.py s'appliquent sinon).
+
+bands:
+  # Bande FM large, pour calibrer / repérer les émetteurs connus
+  - name: fm_broadcast
+    freq_low: "87M"
+    freq_high: "108M"
+    bin_size: "50k"
+    interval_sec: 10
+    exposure: "60"        # 1 sweep complet par minute
+    gain: "40.2"
+    ppm_error: 0
+    device_index: 0
+
+  # Bande aéronautique civile (AM)
+  - name: airband
+    freq_low: "118M"
+    freq_high: "137M"
+    bin_size: "25k"
+    interval_sec: 5
+    exposure: "30"
+    device_index: 0
+
+  # ISM 433 MHz (capteurs, télécommandes, LoRa 433...)
+  - name: ism_433
+    freq_low: "433.0M"
+    freq_high: "434.8M"
+    bin_size: "1k"
+    interval_sec: 5
+    exposure: "120"
+    device_index: 0
+
+  # Large scan "radio-astro" nocturne, faible résolution, longue exposition
+  - name: wide_survey
+    freq_low: "24M"
+    freq_high: "1700M"
+    bin_size: "1M"
+    interval_sec: 20
+    exposure: "3600"      # 1h d'intégration -> bon rapport signal/bruit
+    device_index: 0
+    crop_percent: 20      # rogne les bords de chaque hop (moins d'artefacts de filtre)
+
+scheduler:
+  enabled: true
+  period_sec: 900          # pour le mode `scan --loop` : 1 cycle toutes les 15 min
+  max_runs: null            # null = infini
+  rtl_power_binary: "rtl_power"
+  timeout_margin_sec: 60
+
+storage:
+  raw_dir: "data/raw"
+  dataset_dir: "data/dataset"
+  format: "parquet"         # "parquet" (recommandé, pip install pyarrow) ou "csv"
+  manifest_file: "data/dataset/.ingested_manifest.json"
+
+viz:
+  colormap: "viridis"       # inferno, magma, turbo... (colormaps matplotlib)
+  vmin_db: null              # null = auto (percentile 1)
+  vmax_db: null              # null = auto (percentile 99)
+  figsize: [14, 8]
+  dpi: 130
+  time_format: "%Y-%m-%d %H:%M"
+  output_dir: "output/plots"
+  interactive_html: false   # true -> génère aussi une version Plotly (pip install plotly)
+
+detection:
+  baseline_hours: 24         # fenêtre de "mémoire" du bruit de fond
+  baseline_percentile: 20    # percentile bas = estimation du plancher de bruit
+  threshold_db: 8            # écart déclenchant un événement
+  min_consecutive: 2         # sweeps consécutifs requis pour confirmer
+  output_dir: "output/events"
+
+log_level: "INFO"
