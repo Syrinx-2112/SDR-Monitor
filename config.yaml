@@ -1,0 +1,92 @@
+# Exemple de configuration rtlsdr_monitor.
+# Copie ce fichier en config.yaml et adapte-le : toutes les clés sont
+# optionnelles (les valeurs par défaut de config.py s'appliquent sinon).
+
+bands:
+
+  # Bande aéronautique civile (AM)
+  - name: airband
+    freq_low: "118M"
+    freq_high: "137M"
+    bin_size: "25k"
+    interval_sec: 5
+    exposure: "30"
+    device_index: 0
+
+  # ISM 433 MHz (capteurs, télécommandes, LoRa 433...)
+  - name: ism_433
+    freq_low: "433.0M"
+    freq_high: "434.8M"
+    bin_size: "1k"
+    interval_sec: 5
+    exposure: "120"
+    device_index: 0
+
+  # VHF Marine (canaux 1 à 88, incluant les canaux de détresse/appel)
+  - name: marine_vhf
+    freq_low: "156M"
+    freq_high: "162.05M"
+    bin_size: "12.5k"      # résolution fine = calée sur l'espacement des canaux VHF marine (25 kHz, canaux parfois 12.5 kHz)
+    interval_sec: 5
+    exposure: "60"
+    gain: "40.2"
+    ppm_error: 0
+    device_index: 0
+
+  # AIS (Automatic Identification System) - trafic des navires
+  # Deux canaux étroits : AIS1 161.975 MHz / AIS2 162.025 MHz
+  - name: ais
+    freq_low: "161.9M"
+    freq_high: "162.1M"
+    bin_size: "1k"
+    interval_sec: 2
+    exposure: "60"
+    gain: "40.2"
+    ppm_error: 0
+    device_index: 0
+
+  # Canal 16 VHF (156.800 MHz) - détresse/appel/sécurité, en isolé
+  # utile pour un suivi dédié à haute cadence (peu de bande, sweep rapide)
+  - name: vhf_ch16_distress
+    freq_low: "156.75M"
+    freq_high: "156.85M"
+    bin_size: "1k"
+    interval_sec: 1
+    exposure: "30"
+    gain: "40.2"
+    device_index: 0
+
+
+
+
+scheduler:
+  enabled: true
+  period_sec: 400          # pour le mode `scan --loop` : 1 cycle toutes les 15 min
+  max_runs: null            # null = infini
+  rtl_power_binary: "rtl_power"
+  timeout_margin_sec: 60
+
+storage:
+  raw_dir: "data/raw"
+  dataset_dir: "data/dataset"
+  format: "parquet"         # "parquet" (recommandé, pip install pyarrow) ou "csv"
+  manifest_file: "data/dataset/.ingested_manifest.json"
+
+viz:
+  colormap: "viridis"       # inferno, magma, turbo... (colormaps matplotlib)
+  vmin_db: null              # null = auto (percentile 1)
+  vmax_db: null              # null = auto (percentile 99)
+  figsize: [14, 8]
+  dpi: 130
+  time_format: "%Y-%m-%d %H:%M"
+  output_dir: "output/plots"
+  interactive_html: false   # true -> génère aussi une version Plotly (pip install plotly)
+
+detection:
+  baseline_hours: 24         # fenêtre de "mémoire" du bruit de fond
+  baseline_percentile: 20    # percentile bas = estimation du plancher de bruit
+  threshold_db: 8            # écart déclenchant un événement
+  min_consecutive: 2         # sweeps consécutifs requis pour confirmer
+  output_dir: "output/events"
+
+log_level: "INFO"
